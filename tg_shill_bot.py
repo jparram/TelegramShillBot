@@ -168,6 +168,7 @@ def increment_count(channel):
 
 
 async def handle_message_floodwaiterror(error, channel):
+    print(error)
     log_red(
         f"FloodWaitError invoked while sending a message to {channel['name']};"
         + f" Forcing a {error.seconds} second wait interval for all channels"
@@ -205,6 +206,7 @@ async def handle_chatwriteforbiddenerror(channel):
 
 
 def handle_unknownerror(error):
+    print(error)
     message = "Unknown error invoked while running bot; Abandoning all execution"
     if hasattr(error, "message"):
         message = message + f"\n{error.message}"
@@ -213,6 +215,7 @@ def handle_unknownerror(error):
 
 
 def handle_unknownmessagingerror(error, channel):
+    print(error)
     message = (
         f"Unknown error invoked while sending a message to {channel['name']};"
         + " Abandoning sending all future messages"
@@ -276,9 +279,11 @@ async def dispatch_message(message, channel):
     channel = increment_count(channel)
     log_green(f"Sending message to {channel['name']} (#{channel['count']})")
     if image_exists(channel):
-        await CLIENT.send_message(entity, message, file=channel["image"])
+        async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+            await client.send_message(entity, message, file=channel["image"])
     else:
-        await CLIENT.send_message(entity, message)
+        async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+            await client.send_message(entity, message)
     return channel
 
 
@@ -373,6 +378,7 @@ async def handle_connection_floodwaiterror(error, channel):
 
 
 def handle_connectionerror(error, channel):
+    print(error)
     message = (
         "Unknown error invoked while connecting to a channel;"
         + f" Abandoning sending messages to {channel['name']}"
@@ -394,7 +400,8 @@ async def dispatch_connection(channel):
     await asyncio.sleep(channel["splay"])
     await sleep_while_floodwaiterror_exists(channel)
     log_green(f"Connecting to {channel['name']}")
-    await CLIENT(functions.channels.JoinChannelRequest(channel=channel["name"]))
+    async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+         await client(functions.channels.JoinChannelRequest(channel=channel["name"]))
     channel["is_connected"] = True
     return channel
 
@@ -429,7 +436,8 @@ async def stop():
 
 
 async def start():
-    await CLIENT.start(phone_number())
+    async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+        print('hello')
     await asyncio.sleep(10)
 
     print("")
@@ -439,6 +447,7 @@ async def start():
         + " to avoid Telegram rate limiting"
     )
     channels = await do_connect()
+    print('starting raid')
     await do_raid(channels)
 
 
@@ -604,7 +613,7 @@ def phone_number():
 
 if __name__ == "__main__":
     header()
-    CLIENT = TelegramClient(app_short_name(), api_id(), api_hash())
+    CLIENT = TelegramClient('session_name.session', api_id(), api_hash())
     STATE = {}
     LOOP = asyncio.new_event_loop()
     asyncio.set_event_loop(LOOP)
