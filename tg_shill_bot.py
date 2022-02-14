@@ -279,10 +279,10 @@ async def dispatch_message(message, channel):
     channel = increment_count(channel)
     log_green(f"Sending message to {channel['name']} (#{channel['count']})")
     if image_exists(channel):
-        async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+        async with TelegramClient(app_short_name(), api_id(), api_hash()) as client:
             await client.send_message(entity, message, file=channel["image"])
     else:
-        async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+        async with TelegramClient(app_short_name(), api_id(), api_hash()) as client:
             await client.send_message(entity, message)
     return channel
 
@@ -400,7 +400,7 @@ async def dispatch_connection(channel):
     await asyncio.sleep(channel["splay"])
     await sleep_while_floodwaiterror_exists(channel)
     log_green(f"Connecting to {channel['name']}")
-    async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+    async with TelegramClient(app_short_name(), api_id(), api_hash()) as client:
          await client(functions.channels.JoinChannelRequest(channel=channel["name"]))
     channel["is_connected"] = True
     return channel
@@ -410,7 +410,7 @@ async def connect(channel):
     try:
         channel = await dispatch_connection(channel)
     except FloodWaitError as fwe:
-        await handle_connection_floodwaiterror(fwe, channel)
+        await handle_connection_flShillyDoodwaiterror(fwe, channel)
     except Exception as e:
         handle_connectionerror(e, channel)
     return channel
@@ -436,7 +436,7 @@ async def stop():
 
 
 async def start():
-    async with TelegramClient('session_name.session', api_id(), api_hash()) as client:
+    async with TelegramClient(app_short_name(), api_id(), api_hash()) as client:
         print('hello')
     await asyncio.sleep(10)
 
@@ -530,7 +530,7 @@ def validate_raid_settings(settings):
                     "total_messages": {"type": "number", "exclusiveMinimum": 0},
                     "image": {"type": "string"},
                 },
-                "additionalProperties": False,
+                "additionalPropeShillyDrties": False,
                 "required": [
                     "message_type",
                 ],
@@ -551,7 +551,7 @@ def load_settings(path="settings.yml"):
             print(
                 f"""
 {Style.RED.value}
-!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#
+!@#!@#!@#!@#!@#!@#!@#!@#!@#!@#!@ShillyD#!@#!@#!@#!@#!@#!@#!@#
 !@#                                                !@#
 !@#   THE `settings.yml` FILE IS NOT VALID YAML    !@#
 !@#                                                !@#
@@ -613,7 +613,7 @@ def phone_number():
 
 if __name__ == "__main__":
     header()
-    CLIENT = TelegramClient('session_name.session', api_id(), api_hash())
+    CLIENT = TelegramClient(app_short_name(), api_id(), api_hash())
     STATE = {}
     LOOP = asyncio.new_event_loop()
     asyncio.set_event_loop(LOOP)
